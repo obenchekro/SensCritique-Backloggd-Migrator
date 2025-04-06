@@ -1,15 +1,15 @@
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import { Auth, getAuth } from 'firebase/auth';
-import { ApolloClient, InMemoryCache, HttpLink, gql } from '@apollo/client/core';
+import { ApolloClient, InMemoryCache, HttpLink, gql, NormalizedCache, NormalizedCacheObject } from '@apollo/client/core';
 import fetch from 'cross-fetch';
-import { SensCritiqueAuthOptions } from '../models/sc-auth-options-interface';
+import { SensCritiqueAuthOptions } from '../sc-backloggd-migrator-schemas/sc-auth-options.interface';
 
 export class SensCritiqueClient {
   firebaseApp: FirebaseApp;
   auth: Auth;
-  apolloClient: ApolloClient<unknown>;
+  apolloClient: ApolloClient<NormalizedCacheObject>;
 
-  private constructor(firebaseApp: FirebaseApp, auth: Auth, apolloClient: ApolloClient<unknown>) {
+  private constructor(firebaseApp: FirebaseApp, auth: Auth, apolloClient: ApolloClient<NormalizedCacheObject>) {
     this.firebaseApp = firebaseApp;
     this.auth = auth;
     this.apolloClient = apolloClient;
@@ -36,87 +36,5 @@ export class SensCritiqueClient {
     });
 
     return new SensCritiqueClient(app, auth, apolloClient);
-  }
-
-  async isAuthenticated(): Promise<boolean> {
-    const query = gql`
-      query {
-        me {
-          id
-        }
-      }
-    `;
-
-    try {
-      const result = await this.apolloClient.query({ query });
-      return !!result?.data?.me?.id;
-    } catch (err) {
-      console.error("❌ Auth Apollo échouée :", err);
-      return false;
-    }
-  }
-
-  async resolveUsernameByUid(uid: number): Promise<string | null> {
-    const query = gql`
-      query ResolveUsername($uid: ID!) {
-        user(id: $uid) {
-          name
-        }
-      }
-    `;
-  
-    try {
-      const result = await this.apolloClient.query({
-        query,
-        variables: { uid }
-      });
-  
-      return result?.data?.user?.name ?? null;
-    } catch (err) {
-      console.error("❌ Erreur lors de la résolution du username :", err);
-      return null;
-    }
-  }  
-
-  async getUserRatings(username: string): Promise<any[]> {
-    const query = gql`
-    query GetRatings($username: String!) {
-      user(username: $username) {
-        collection(limit: 100) {
-          products {
-            id
-            title
-            url
-            rating
-            yearOfProduction
-            dateRelease
-            synopsis
-            medias {
-              picture
-              backdrop
-            }
-            genresInfos {
-              label
-            }
-            otherUserInfos(username: $username) {
-              rating
-            }
-          }
-        }
-      }
-    }
-  `;
-
-    try {
-      const result = await this.apolloClient.query({
-        query,
-        variables: { username },
-      });
-
-      return result?.data?.user?.collection?.products || [];
-    } catch (err) {
-      console.error("❌ Erreur lors de la récupération des notations :", err);
-      return [];
-    }
   }
 }

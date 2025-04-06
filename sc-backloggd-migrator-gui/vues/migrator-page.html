@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SensCritique ↔ Backloggd Migrator</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div class="logo-group">
+    <img src="../assets/senscritique.png" alt="SC" class="logo" />
+    <span class="logo-separator">↔</span>
+    <img src="../assets/backloggd.png" alt="Backloggd" class="logo" />
+  </div>
+
+  <h1>Start your Migration</h1>
+  <button class="button" id="start-btn">Go to SensCritique</button>
+
+  <div class="workflow">
+    <h2>Migration Workflow</h2>
+    <ol>
+      <li>Log in to SensCritique</li>
+      <li>Extract Firebase authentication token</li>
+      <li>Retrieve your rated content</li>
+      <li>Prepare data for import into Backloggd</li>
+    </ol>
+  </div>
+
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      const button = document.getElementById("start-btn");
+      button?.addEventListener("click", () => {
+        window.electronAPI?.startMigration?.();
+      });
+    });
+  </script>
+</body>
+</html>

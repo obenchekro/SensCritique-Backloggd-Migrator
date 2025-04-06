@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "dist/main.js",
   "scripts": {
-    "start": "electron dist/sc-backloggd-migrator-gui/main.js",
+    "start": "electron electron.ts",
     "build": "tsc"
   },
   "dependencies": {

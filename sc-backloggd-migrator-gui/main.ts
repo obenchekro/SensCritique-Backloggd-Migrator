@@ -1,35 +1,50 @@
-import { app, BrowserWindow } from 'electron';
-import { extractUsernameFromDOM, pollUserMetadata } from './user-metadata';
-import { SensCritiqueClient } from '../sc-backloggd-migrator-client/senscritique-client'
+import { app, BrowserWindow, ipcMain } from 'electron';
+import path from 'path';
+import { pollUserMetadata, extractUsernameFromDOM } from './user-metadata';
+import { SensCritiqueClient } from '../sc-backloggd-migrator-client/senscritique-client';
+import { SensCritiqueGraphQLService } from '../sc-backloggd-migrator-client/senscritique-query';
+import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
+import { GetRatingsResponse, SensCritiqueProduct } from '../sc-backloggd-migrator-schemas/sc-products.interface';
 
 let mainWindow: BrowserWindow;
 
+app.commandLine.appendSwitch('enable-logging');
 app.whenReady().then(async () => {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     webPreferences: {
       nodeIntegration: false,
-      contextIsolation: true
+      contextIsolation: true,
+      preload: path.resolve(__dirname, '../dist/sc-backloggd-migrator-gui/preload.js')
     },
   });
 
-  await mainWindow.loadURL("https://www.senscritique.com");
+  await mainWindow.loadFile(path.resolve(__dirname, 'vues/migrator-page.html'));
+  async function fetchUserRatings(username: string, client: ApolloClient<NormalizedCacheObject>): Promise<SensCritiqueProduct[]> {
+    const scQueryService = new SensCritiqueGraphQLService(client);
+    const query = scQueryService.getUserRatingsQuery();
+    const result = await scQueryService.executeQuery<GetRatingsResponse, { username: string }>(query, { username });
 
-  mainWindow.webContents.once('did-finish-load', async () => {
-    try {
-      pollUserMetadata(mainWindow).then(async firebaseMetadata => {
+    return result.user?.collection?.products ?? [];
+  }
+  ipcMain.handle('start-migration', async () => {
+    await mainWindow.loadURL('https://www.senscritique.com');
+
+    mainWindow.webContents.once('did-finish-load', async () => {
+      try {
+        const firebaseMetadata = await pollUserMetadata(mainWindow);
+        console.log(firebaseMetadata)
         await new Promise(resolve => setTimeout(resolve, 3000));
         const username = await extractUsernameFromDOM(mainWindow);
         const metadata = { ...firebaseMetadata, username };
 
-        const client = await SensCritiqueClient.build(metadata);
-        const profile = await client.getUserRatings(<string>metadata.username);
-        console.log(JSON.stringify(profile, null, 2));
-      });
-    } catch (error) {
-      console.error(error);
-    }
+        const scClient = await SensCritiqueClient.build(metadata);
+        const products = await fetchUserRatings(<string>metadata.username, scClient.apolloClient);
+        console.log(`✅ Query fully executed: ${JSON.stringify(products, null, 2)}`);
+      } catch (error) {
+        console.error(`Error while fetching data from firebase: ${error}`);
+      }
+    });
   });
 });
-
