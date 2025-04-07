@@ -26,7 +26,7 @@ export class SensCritiqueGraphQLService {
         return gql`
             query GetRatings($username: String!) {
                 user(username: $username) {
-                    collection(limit: 100) {
+                    collection(limit: 99999) {
                         products {
                             id
                             title

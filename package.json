@@ -8,11 +8,15 @@
   },
   "dependencies": {
     "@apollo/client": "^3.13.6",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.1",
     "apollo": "^2.34.0",
     "cross-fetch": "^4.1.0",
     "firebase": "^11.6.0",
     "graphql": "^16.10.0",
-    "graphql-request": "^6.1.0"
+    "graphql-request": "^6.1.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   },
   "devDependencies": {
     "electron": "^27.1.0",

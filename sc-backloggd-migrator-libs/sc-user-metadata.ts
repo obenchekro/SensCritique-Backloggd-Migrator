@@ -1,9 +1,10 @@
 import { BrowserWindow } from 'electron';
 import { SensCritiqueAuthOptions } from '../sc-backloggd-migrator-schemas/sc-auth-options.interface';
+import { delay } from '../sc-backloggd-migrator-utils/delay';
 const { FIREBASE_METADATA_SECRETS_MAP } = require('../sc-backloggd-migrator-utils/indexedDB');
 const { USERNAME_SENSCRITIQUE_DOM_CONTENT } = require('../sc-backloggd-migrator-utils/dom');
 
-export async function pollUserMetadata(window: BrowserWindow, maxRetries = Number.MAX_SAFE_INTEGER, delay = 1000): Promise<SensCritiqueAuthOptions> {
+export async function pollUserMetadata(window: BrowserWindow, maxRetries = Number.MAX_SAFE_INTEGER, delayInMs = 1000): Promise<SensCritiqueAuthOptions> {
   let attempt: number = 0;
 
   while (attempt < maxRetries) {
@@ -16,7 +17,7 @@ export async function pollUserMetadata(window: BrowserWindow, maxRetries = Numbe
       console.error(`Cannot evaluate js code injected inside the browser. See the error here: ${error}`);
     }
     console.log(`Retry for fetching firebase metadata: ${attempt + 1}/${maxRetries}...`);
-    await new Promise(resolve => setTimeout(resolve, delay));
+    await delay(delayInMs);
     attempt++;
   }
 
