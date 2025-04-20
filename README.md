@@ -39,12 +39,12 @@ Use at your own risk — and feel free to submit improvements or bug reports by 
 ### Step 1
 Launch the migration process by clicking on the "Go To SensCritique" button
 
-![SC1](https://i.imgur.com/Z98clHd_d.webp?maxwidth=760&fidelity=grand)
+![SC1](https://i.imgur.com/0V9mh4A.png)
 
 ### Step 2
 Simply log in to your SensCritique account as usual
 
-![SC2](https://i.imgur.com/MMLfyan_d.webp?maxwidth=760&fidelity=grand)
+![SC2](https://i.imgur.com/UbmlIKF.png)
 
 You'll be redirected to this following page where all your games rated would be gathered up! Wait until all the games are fetched!
 
@@ -54,6 +54,7 @@ You'll be redirected to this following page where all your games rated would be 
 
 You'll be again redirected to the backloggd login page where you'll connect to your account as you normally would
 
+![SC4](https://i.imgur.com/UFF28zc.png)
 
 ### Step 4
 
@@ -61,4 +62,10 @@ You'll be again redirected to the backloggd login page where you'll connect to y
 
 Sit back, relax, and enjoy this [videogamedunkey video](https://www.youtube.com/watch?v=ojapVW-7lQ0) while the app takes care of rating each of your migrated games, page by page — all by itself!
 
+![SC5](https://i.imgur.com/6E2ARD8.png)
+
+Then finally, when all your migration ratings come to fruition...
+You'll be automatically redirected to your rated games page – a satisfying proof that the migration has been successfully accomplished
+
+![SC5](https://i.imgur.com/N2TkjLP.png)
 
