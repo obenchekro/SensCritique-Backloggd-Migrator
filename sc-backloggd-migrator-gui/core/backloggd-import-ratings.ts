@@ -1,7 +1,7 @@
 import { BrowserWindow } from "electron";
 import { slugify } from "../../sc-backloggd-migrator-utils/slug";
 import { readSavedGames } from "../../sc-backloggd-migrator-utils/filesystem";
-const { BACKLOGGD_AUTOMATION_SCRIPT } = require('./backloggd-events-dom');
+const { BACKLOGGD_AUTOMATION_SCRIPT } = require('../../sc-backloggd-migrator-utils/dom');
 
 export async function runBackloggdRatingAutomation(window: BrowserWindow): Promise<void> {
   try {
