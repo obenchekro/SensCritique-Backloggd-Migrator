@@ -7,9 +7,7 @@ const { BACKLOGGD_AUTOMATION_SCRIPT, USERNAME_BACKLOGGD_DOM_CONTENT } = require(
 export async function runBackloggdRatingAutomation(window: BrowserWindow): Promise<void> {
   try {
     const collectionGameRatings = readSavedGames();
-    const username = await window.webContents.executeJavaScript(`
-      (${USERNAME_BACKLOGGD_DOM_CONTENT.toString()})()
-    `);
+    const username = await window.webContents.executeJavaScript(`(${USERNAME_BACKLOGGD_DOM_CONTENT.toString()})()`);
 
     for (const game of collectionGameRatings) {
       await delay(3000)

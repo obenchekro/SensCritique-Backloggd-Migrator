@@ -26,9 +26,7 @@ export async function pollUserMetadata(window: BrowserWindow, maxRetries = Numbe
 
 export async function extractUsernameFromDOM(window: BrowserWindow): Promise<string | undefined> {
   try {
-    const username = await window.webContents.executeJavaScript(`
-      (${USERNAME_SENSCRITIQUE_DOM_CONTENT.toString()})()
-    `);
+    const username = await window.webContents.executeJavaScript(`(${USERNAME_SENSCRITIQUE_DOM_CONTENT.toString()})()`);
     return username;
   } catch (error) {
     console.error(`Cannot scrap the username from the DOM elements: ${error}`);

@@ -6,8 +6,9 @@ import { delay } from '../../sc-backloggd-migrator-utils/delay';
 import { SensCritiqueGraphQLService } from '../../sc-backloggd-migrator-client/sc-query';
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import { GetRatingsResponse, SensCritiqueProduct } from '../../sc-backloggd-migrator-schemas/sc-products.interface';
+import { BackloggdGames } from '../../sc-backloggd-migrator-schemas/backloggd-games.interface';
 
-export async function runMigration(window: BrowserWindow) {
+export async function runMigration(window: BrowserWindow): Promise<BackloggdGames[]> {
   try {
     const firebaseMetaData = await pollUserMetadata(window);
     await delay(3000);
