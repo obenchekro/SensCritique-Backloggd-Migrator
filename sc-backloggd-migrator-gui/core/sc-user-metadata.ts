@@ -1,8 +1,7 @@
 import { BrowserWindow } from 'electron';
 import { SensCritiqueAuthOptions } from '../../sc-backloggd-migrator-schemas/sc-auth-options.interface';
 import { delay } from '../../sc-backloggd-migrator-utils/delay';
-const { FIREBASE_METADATA_SECRETS_MAP } = require('../../sc-backloggd-migrator-utils/indexedDB');
-const { USERNAME_SENSCRITIQUE_DOM_CONTENT } = require('../../sc-backloggd-migrator-utils/dom');
+const { FIREBASE_METADATA_SECRETS_MAP, USERNAME_SENSCRITIQUE_DOM_CONTENT } = require('../../sc-backloggd-migrator-scripts/sc-dom-crawling');
 
 export async function pollUserMetadata(window: BrowserWindow, maxRetries = Number.MAX_SAFE_INTEGER, delayInMs = 1000): Promise<SensCritiqueAuthOptions> {
   let attempt: number = 0;

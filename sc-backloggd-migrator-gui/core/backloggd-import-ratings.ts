@@ -2,7 +2,7 @@ import { BrowserWindow } from "electron";
 import { slugify } from "../../sc-backloggd-migrator-utils/slug";
 import { readSavedGames } from "../../sc-backloggd-migrator-utils/filesystem";
 import { delay } from '../../sc-backloggd-migrator-utils/delay';
-const { BACKLOGGD_AUTOMATION_SCRIPT, USERNAME_BACKLOGGD_DOM_CONTENT } = require('../../sc-backloggd-migrator-utils/dom');
+const { BACKLOGGD_AUTOMATION_SCRIPT, USERNAME_BACKLOGGD_DOM_CONTENT } = require('../../sc-backloggd-migrator-scripts/backloggd-dom-crawling');
 
 export async function runBackloggdRatingAutomation(window: BrowserWindow): Promise<void> {
   try {
