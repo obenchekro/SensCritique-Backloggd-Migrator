@@ -31,6 +31,12 @@
             try {
                 printLine("🔄 Trying to fetch data from your SensCritique account...");
                 const scGames = await window.electronAPI.redirectToDisplay();
+
+                if (!scGames || scGames.length === 0) {
+                    printLine("❌ No game data was found. Please make sure your SensCritique account has games listed or that you're connected correctly.");
+                    return;
+                }
+                
                 printLine("📦 Data fetched. Import in progress...\n");
                 for (let i = 0; i < scGames.length; i++) {
                     const game = scGames[i];

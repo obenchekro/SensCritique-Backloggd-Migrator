@@ -16,7 +16,7 @@ export async function pollUserCookie(window: BrowserWindow): Promise<string | un
   return retry(
     async () => {
       const cookies = await window.webContents.session.cookies.get({ url: 'https://www.senscritique.com' });
-      return cookies.find(c => c.name === 'BT_sid')?.value;
+      return cookies.find(c => c.name === 'SC_AUTH')?.value;
     },
     'Failed to extract the session cookie after multiple retries.'
   );

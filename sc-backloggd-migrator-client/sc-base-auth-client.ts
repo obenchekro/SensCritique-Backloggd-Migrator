@@ -19,7 +19,7 @@ export class SensCritiqueBaseAuthStrategy implements ISensCritiqueAuthStrategy {
 
         const response = await fetch(url, {
             headers: {
-                'Cookie': this.cookie,
+                'Cookie': `SC_AUTH=${this.cookie}`,
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36'
             }
         });
@@ -30,6 +30,6 @@ export class SensCritiqueBaseAuthStrategy implements ISensCritiqueAuthStrategy {
     }
 
     fetchUserGamesOnlyRated(products: SensCritiqueProduct[]): BackloggdGames[] {
-        throw new Error('Method not implemented.');
+        return [];
     }
 }

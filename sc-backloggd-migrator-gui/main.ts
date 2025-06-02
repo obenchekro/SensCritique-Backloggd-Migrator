@@ -26,7 +26,7 @@ app.whenReady().then(async () => {
     await mainWindow.loadURL('https://www.senscritique.com');
     mainWindow.webContents.once('did-finish-load', async () => {
       const games = await runMigration(mainWindow);
-      if (games.length > 0) {
+      if (games) {
         await mainWindow.loadFile(path.resolve(__dirname, 'vues/real-time-data/real-time-data.html'));
       }
     });
