@@ -1,33 +1,34 @@
 import { BrowserWindow } from 'electron';
 import { SensCritiqueAuthOptions } from '../../sc-backloggd-migrator-schemas/sc-auth-options.interface';
-import { delay } from '../../sc-backloggd-migrator-utils/delay';
+import { retry } from '../../sc-backloggd-migrator-utils/retry';
 const { FIREBASE_METADATA_SECRETS_MAP, USERNAME_SENSCRITIQUE_DOM_CONTENT } = require('../../sc-backloggd-migrator-scripts/sc-dom-crawling');
 
-export async function pollUserMetadata(window: BrowserWindow, maxRetries = Number.MAX_SAFE_INTEGER, delayInMs = 1000): Promise<SensCritiqueAuthOptions> {
-  let attempt: number = 0;
+export async function pollUserMetadata(window: BrowserWindow): Promise<SensCritiqueAuthOptions> {
+  return retry(
+    async () => {
+      return await window.webContents.executeJavaScript(`(${FIREBASE_METADATA_SECRETS_MAP.toString()})()`);
+    },
+    'Failed to retrieve Firebase metadata after multiple retries.'
+  );
+}
 
-  while (attempt < maxRetries) {
-    try {
-      const firebaseAuthUser: SensCritiqueAuthOptions | null = await window.webContents.executeJavaScript(`
-        (${FIREBASE_METADATA_SECRETS_MAP.toString()})()
-      `);
-      if (firebaseAuthUser) return firebaseAuthUser;
-    } catch (error) {
-      console.error(`Cannot evaluate js code injected inside the browser. See the error here: ${error}`);
-    }
-    console.log(`Retry for fetching firebase metadata: ${attempt + 1}/${maxRetries}...`);
-    await delay(delayInMs);
-    attempt++;
-  }
-
-  throw new Error("Failed to retrieve firebase metadata after many retries");
+export async function pollUserCookie(window: BrowserWindow): Promise<string | undefined> {
+  return retry(
+    async () => {
+      const cookies = await window.webContents.session.cookies.get({ url: 'https://www.senscritique.com' });
+      return cookies.find(c => c.name === 'BT_sid')?.value;
+    },
+    'Failed to extract the session cookie after multiple retries.'
+  );
 }
 
 export async function extractUsernameFromDOM(window: BrowserWindow): Promise<string | undefined> {
-  try {
-    const username = await window.webContents.executeJavaScript(`(${USERNAME_SENSCRITIQUE_DOM_CONTENT.toString()})()`);
-    return username;
-  } catch (error) {
-    console.error(`Cannot scrap the username from the DOM elements: ${error}`);
-  }
+  return retry(
+    async () => {
+      return await window.webContents.executeJavaScript(`(${USERNAME_SENSCRITIQUE_DOM_CONTENT.toString()})()`);
+    },
+    'Failed to extract username from the DOM.',
+    10,
+    500,
+  );
 }
