@@ -3,7 +3,7 @@ import { SensCritiqueScrappedProduct } from '../sc-backloggd-migrator-schemas/sc
 import { BackloggdGames } from '../sc-backloggd-migrator-schemas/backloggd-games.interface';
 import { BrowserWindow } from 'electron';
 import { delay } from '../sc-backloggd-migrator-utils/delay';
-const { SENSCRITIQUE_BASE_AUTOMATION_SCRIPT } = require('../sc-backloggd-migrator-scripts/sc-dom-crawling');
+const { DETECT_SC_TOTAL_PAGES, EXTRACT_SC_PAGE_DATA } = require('../sc-backloggd-migrator-scripts/sc-dom-crawling');
 
 export class SensCritiqueBaseAuthStrategy implements ISensCritiqueAuthStrategy {
     private cookie: string;
@@ -17,14 +17,23 @@ export class SensCritiqueBaseAuthStrategy implements ISensCritiqueAuthStrategy {
     }
 
     async fetchUserRatings(username: string, window: BrowserWindow): Promise<SensCritiqueScrappedProduct[]> {
-        const url = `https://www.senscritique.com/${username}/collection`;
-        await window.loadURL(url);
+        const allData = [];
 
-        await delay(300);
-        const products: SensCritiqueScrappedProduct[] = await window.webContents.executeJavaScript(
-            `(${SENSCRITIQUE_BASE_AUTOMATION_SCRIPT.toString()})()`
-        );
-        return products;
+        const baseUrl = `https://www.senscritique.com/${username}/collection`;
+        await window.loadURL(baseUrl);
+        await delay(800);
+
+        const totalPages: number = await window.webContents.executeJavaScript(`(${DETECT_SC_TOTAL_PAGES.toString()})()`);
+
+        for (let page = 1; page <= totalPages; page++) {
+            const url = `${baseUrl}?page=${page}`;
+            await window.loadURL(url);
+            await delay(800);
+
+            const pageData = await window.webContents.executeJavaScript(`(${EXTRACT_SC_PAGE_DATA.toString()})()`);
+            allData.push(...pageData);
+        }
+        return allData;
     }
 
     fetchUserGamesOnlyRated(products: SensCritiqueScrappedProduct[]): BackloggdGames[] {
