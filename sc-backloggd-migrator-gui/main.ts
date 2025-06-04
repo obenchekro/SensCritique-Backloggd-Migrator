@@ -3,6 +3,7 @@ import path from 'path';
 import { runMigration } from './core/sc-migration-ratings';
 import { readSavedGames } from '../sc-backloggd-migrator-utils/filesystem';
 import { runBackloggdRatingAutomation } from './core/backloggd-import-ratings';
+import { flushMetadata } from './core/sc-user-metadata';
 
 let mainWindow: BrowserWindow;
 
@@ -21,6 +22,7 @@ app.whenReady().then(async () => {
   });
 
   await mainWindow.loadFile(path.resolve(__dirname, 'vues/migrator-page/migrator-page.html'));
+  await flushMetadata(mainWindow);
 
   ipcMain.handle('start-migration', async () => {
     await mainWindow.loadURL('https://www.senscritique.com');

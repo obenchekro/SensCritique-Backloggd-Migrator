@@ -1,5 +1,5 @@
 import { BrowserWindow } from 'electron';
-import { pollUserCookie, pollUserMetadata } from '../sc-backloggd-migrator-gui/core/sc-user-metadata';
+import { flushMetadata, pollUserCookie, pollUserMetadata } from '../sc-backloggd-migrator-gui/core/sc-user-metadata';
 import { delay } from '../sc-backloggd-migrator-utils/delay';
 import { SensCritiqueSSOAuthClient } from './sc-sso-auth-client';
 import { SensCritiqueBaseAuthStrategy } from './sc-base-auth-client';
@@ -8,6 +8,7 @@ export class SensCritiqueClientStrategy {
     static async build(window: BrowserWindow): Promise<SensCritiqueSSOAuthClient | SensCritiqueBaseAuthStrategy> {
         const strategiesMap: Record<'sso' | 'base', () => Promise<SensCritiqueSSOAuthClient | SensCritiqueBaseAuthStrategy>> = {
             sso: async () => {
+                await flushMetadata(window);
                 const firebaseMetaData = await pollUserMetadata(window);
                 await delay(3000);
                 console.log('✅ SSO mode enabled');

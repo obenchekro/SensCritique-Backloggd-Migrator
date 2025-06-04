@@ -24,6 +24,12 @@ export interface SensCritiqueProduct {
     otherUserInfos: ProductUserInfos;
 };
 
+export interface SensCritiqueScrappedProduct {
+    title: string;
+    rating: number;
+    genre: string;
+};
+
 export interface GetRatingsResponse {
     user: {
         collection: {

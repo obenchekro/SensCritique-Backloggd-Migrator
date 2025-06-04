@@ -1,7 +1,9 @@
-import fetch from 'cross-fetch';
 import { ISensCritiqueAuthStrategy } from './sc-client-strategy.interface';
-import { SensCritiqueProduct } from '../sc-backloggd-migrator-schemas/sc-products.interface';
+import { SensCritiqueScrappedProduct } from '../sc-backloggd-migrator-schemas/sc-products.interface';
 import { BackloggdGames } from '../sc-backloggd-migrator-schemas/backloggd-games.interface';
+import { BrowserWindow } from 'electron';
+import { delay } from '../sc-backloggd-migrator-utils/delay';
+const { SENSCRITIQUE_BASE_AUTOMATION_SCRIPT } = require('../sc-backloggd-migrator-scripts/sc-dom-crawling');
 
 export class SensCritiqueBaseAuthStrategy implements ISensCritiqueAuthStrategy {
     private cookie: string;
@@ -14,22 +16,20 @@ export class SensCritiqueBaseAuthStrategy implements ISensCritiqueAuthStrategy {
         return new SensCritiqueBaseAuthStrategy(cookie);
     }
 
-    async fetchUserRatings(username: string): Promise<SensCritiqueProduct[]> {
+    async fetchUserRatings(username: string, window: BrowserWindow): Promise<SensCritiqueScrappedProduct[]> {
         const url = `https://www.senscritique.com/${username}/collection`;
+        await window.loadURL(url);
 
-        const response = await fetch(url, {
-            headers: {
-                'Cookie': `SC_AUTH=${this.cookie}`,
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36'
-            }
-        });
-
-        const products: SensCritiqueProduct[] = [];
-        // TODO
+        await delay(300);
+        const products: SensCritiqueScrappedProduct[] = await window.webContents.executeJavaScript(
+            `(${SENSCRITIQUE_BASE_AUTOMATION_SCRIPT.toString()})()`
+        );
         return products;
     }
 
-    fetchUserGamesOnlyRated(products: SensCritiqueProduct[]): BackloggdGames[] {
-        return [];
+    fetchUserGamesOnlyRated(products: SensCritiqueScrappedProduct[]): BackloggdGames[] {
+        return products
+            .filter(p => p.genre === 'Jeu')
+            .map(p => ({ title: p.title, rating: p.rating }));
     }
 }

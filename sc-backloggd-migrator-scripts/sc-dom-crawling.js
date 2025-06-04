@@ -57,7 +57,61 @@ const USERNAME_SENSCRITIQUE_DOM_CONTENT = async () => {
     });
 };
 
+const SENSCRITIQUE_BASE_AUTOMATION_SCRIPT = async () => {
+    const results = [];
+
+    const extractPageData = () => {
+        const pageResults = [];
+        const gameCards = document.querySelectorAll('div[data-testid="poster"]');
+        gameCards.forEach((card) => {
+            const img = card.querySelector('img[data-testid="poster-img"]');
+
+            const ratingEl = Array.from(card.parentElement?.querySelectorAll('div[data-testid="Rating"]') || [])
+                .find(el => !el.classList.contains('globalRating'));
+
+            const title = img?.alt?.trim() ?? '';
+            const rating = ratingEl ? parseFloat(ratingEl.textContent || '') : null;
+
+            const genreEl = card.parentElement?.parentElement?.parentElement?.querySelector('span[data-testid="creators-category"] span');
+            const genre = genreEl?.textContent?.trim() ?? '';
+
+            if (title && rating !== null && !isNaN(rating)) {
+                pageResults.push({ title, rating, genre });
+            }
+        });
+        return pageResults;
+    };
+
+    try {
+        const paginationSpans = document.querySelectorAll('nav[aria-label="Navigation de la pagination"] span[data-testid^="click-"]');
+        const pageNumbers = Array.from(paginationSpans).map(el => parseInt(el.textContent)).filter(n => !isNaN(n));
+        const totalPages = Math.max(...pageNumbers, 1);
+
+        for (let page = 1; page <= totalPages; page++) {
+            if (page > 1) {
+                await fetch(`/patchwork-chimera/collection?page=${page}`, { credentials: 'same-origin' })
+                    .then(resp => resp.text())
+                    .then(html => {
+                        document.documentElement.innerHTML = html;
+                    });
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+
+            results.push(...extractPageData());
+        }
+
+        return results;
+    } catch (e) {
+        console.error('SCRAPING FAILED:', e);
+        return [];
+    }
+};
+
+const SENSCRITIQUE_FIREBASE_METADATA_TO_TRASH = async () => indexedDB.deleteDatabase("firebaseLocalStorageDb");
+
 module.exports = {
     FIREBASE_METADATA_SECRETS_MAP,
     USERNAME_SENSCRITIQUE_DOM_CONTENT,
+    SENSCRITIQUE_BASE_AUTOMATION_SCRIPT,
+    SENSCRITIQUE_FIREBASE_METADATA_TO_TRASH
 };
