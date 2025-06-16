@@ -7,7 +7,7 @@ import { ISensCritiqueAuthStrategy } from './sc-client-strategy.interface';
 import { GetRatingsResponse, SensCritiqueProduct } from '../sc-backloggd-migrator-schemas/sc-products.interface';
 import { BackloggdGames } from '../sc-backloggd-migrator-schemas/backloggd-games.interface';
 
-export class SensCritiqueSSOAuthClient implements ISensCritiqueAuthStrategy {
+export class SensCritiqueSSOAuthStrategy implements ISensCritiqueAuthStrategy {
   firebaseApp: FirebaseApp;
   auth: Auth;
   client: ApolloClient<NormalizedCacheObject>;
@@ -18,7 +18,7 @@ export class SensCritiqueSSOAuthClient implements ISensCritiqueAuthStrategy {
     this.client = client;
   }
 
-  static async build(scAuthOptions: SensCritiqueAuthOptions): Promise<SensCritiqueSSOAuthClient> {
+  static async build(scAuthOptions: SensCritiqueAuthOptions): Promise<SensCritiqueSSOAuthStrategy> {
     const firebaseConfig: Omit<SensCritiqueAuthOptions, "accessToken" | "email" | "uid" | "username"> = {
       apiKey: scAuthOptions.apiKey,
       authDomain: scAuthOptions.authDomain
@@ -38,7 +38,7 @@ export class SensCritiqueSSOAuthClient implements ISensCritiqueAuthStrategy {
       cache: new InMemoryCache(),
     });
 
-    return new SensCritiqueSSOAuthClient(app, auth, apolloClient);
+    return new SensCritiqueSSOAuthStrategy(app, auth, apolloClient);
   }
 
   async executeQuery<TData, TVariables extends Record<string, unknown> = Record<string, never>>(query: DocumentNode, variables?: TVariables): Promise<TData> {

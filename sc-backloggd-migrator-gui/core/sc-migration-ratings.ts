@@ -6,6 +6,7 @@ import { BackloggdGames } from '../../sc-backloggd-migrator-schemas/backloggd-ga
 import { SensCritiqueClientStrategy } from '../../sc-backloggd-migrator-client/sc-client-strategy';
 import { ISensCritiqueAuthStrategy } from '../../sc-backloggd-migrator-client/sc-client-strategy.interface';
 import { SensCritiqueProduct, SensCritiqueScrappedProduct } from '../../sc-backloggd-migrator-schemas/sc-products.interface';
+
 export async function runMigration(window: BrowserWindow): Promise<BackloggdGames[]> {
   try {
     const scClient: ISensCritiqueAuthStrategy = await SensCritiqueClientStrategy.build(window);
@@ -14,8 +15,8 @@ export async function runMigration(window: BrowserWindow): Promise<BackloggdGame
     const username = await extractUsernameFromDOM(window);
     if (!username) throw new Error('Cannot retrieve SC username.');
 
-    const products: (SensCritiqueScrappedProduct | SensCritiqueProduct)[] = await scClient.fetchUserRatings(username, window);
-    const games: BackloggdGames[] = scClient.fetchUserGamesOnlyRated(products);
+    const products = await scClient.fetchUserRatings(username, window);
+    const games = scClient.fetchUserGamesOnlyRated(products);
     writeSavedGames(games);
     return games;
   } catch (error) {

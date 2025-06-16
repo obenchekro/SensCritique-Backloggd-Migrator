@@ -4,7 +4,7 @@ import { BackloggdGames } from '../sc-backloggd-migrator-schemas/backloggd-games
 
 const filePath = path.resolve(__dirname, '../sc-backloggd-migrator-gui/assets/senscritique_game_ratings.json');
 
-export function writeSavedGames(games: BackloggdGames[]) {
+export function writeSavedGames(games: BackloggdGames[]): void {
   const dir = path.dirname(filePath);
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
   writeFileSync(filePath, JSON.stringify(games, null, 2));

@@ -12,7 +12,7 @@ export class SensCritiqueBaseAuthStrategy implements ISensCritiqueAuthStrategy {
         this.cookie = cookie;
     }
 
-    static async build(cookie: string): Promise<SensCritiqueBaseAuthStrategy> {
+    static async build(cookie: string): Promise<ISensCritiqueAuthStrategy> {
         return new SensCritiqueBaseAuthStrategy(cookie);
     }
 
