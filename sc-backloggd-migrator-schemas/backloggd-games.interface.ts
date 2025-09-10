@@ -1,4 +1,5 @@
 export interface BackloggdGames {
     title: string,
-    rating: number
+    rating: number,
+    migrated: boolean
 };

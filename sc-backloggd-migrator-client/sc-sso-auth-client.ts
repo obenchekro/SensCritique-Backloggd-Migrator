@@ -96,6 +96,6 @@ export class SensCritiqueSSOAuthStrategy implements ISensCritiqueAuthStrategy {
   fetchUserGamesOnlyRated(products: SensCritiqueProduct[]): BackloggdGames[] {
     return products
       .filter(p => p.url?.split('/')?.[1] === 'jeuvideo' && p.otherUserInfos.rating)
-      .map(p => ({ title: p.title, rating: p.otherUserInfos.rating }));
+      .map(p => ({ title: p.title, rating: p.otherUserInfos.rating, migrated: false }));
   };
 }

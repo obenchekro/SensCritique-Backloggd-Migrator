@@ -36,30 +36,31 @@ app.whenReady().then(async () => {
 
   ipcMain.handle('run-backloggd-rating', async () => {
     try {
-      mainWindow.webContents.setMaxListeners(0);
       await mainWindow.loadURL('https://backloggd.com/users/sign_in');
+
+      return new Promise((resolve) => {
+        const handler = async () => {
+          const url = mainWindow.webContents.getURL();
+
+          if (!url.includes('/users/sign_in')) {
+            mainWindow.webContents.removeListener('did-navigate', handler);
+            mainWindow.webContents.removeListener('did-navigate-in-page', handler);
+
+            try {
+              const result = await runBackloggdRatingAutomation(mainWindow);
+              resolve({ success: true, data: result });
+            } catch (err) {
+              resolve({ success: false, error: err });
+            }
+          }
+        };
+
+        mainWindow.webContents.on('did-navigate', handler);
+        mainWindow.webContents.on('did-navigate-in-page', handler);
+      });
     } catch (error) {
       return { success: false, error };
     }
-
-    return new Promise((resolve) => {
-      const listener = async () => {
-        try {
-          const currentUrl = mainWindow.webContents.getURL();
-
-          if (!currentUrl.includes('/users/sign_in')) {
-            mainWindow.webContents.removeListener('did-navigate', listener);
-            const ratingAutomation = await runBackloggdRatingAutomation(mainWindow);
-            resolve(ratingAutomation);
-          }
-        } catch (error) {
-          mainWindow.webContents.removeListener('did-navigate', listener);
-          resolve({ success: false, error });
-        }
-      };
-
-      mainWindow.webContents.on('did-navigate', listener);
-    });
   });
 
   ipcMain.handle('redirect-to-display', () => {

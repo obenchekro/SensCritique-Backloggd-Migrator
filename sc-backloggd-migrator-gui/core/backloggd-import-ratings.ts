@@ -1,12 +1,12 @@
 import { BrowserWindow } from "electron";
 import { slugify } from "../../sc-backloggd-migrator-utils/slug";
-import { readSavedGames } from "../../sc-backloggd-migrator-utils/filesystem";
+import { readSavedGames, updateMigrationStatus } from "../../sc-backloggd-migrator-utils/filesystem";
 import { delay } from '../../sc-backloggd-migrator-utils/delay';
 const { BACKLOGGD_AUTOMATION_SCRIPT, USERNAME_BACKLOGGD_DOM_CONTENT } = require('../../sc-backloggd-migrator-scripts/backloggd-dom-crawling');
 
 export async function runBackloggdRatingAutomation(window: BrowserWindow): Promise<void> {
   try {
-    const collectionGameRatings = readSavedGames();
+    const collectionGameRatings = readSavedGames().filter(game => game.migrated === false);
     const username = await window.webContents.executeJavaScript(`(${USERNAME_BACKLOGGD_DOM_CONTENT.toString()})()`);
 
     for (const game of collectionGameRatings) {
@@ -17,6 +17,7 @@ export async function runBackloggdRatingAutomation(window: BrowserWindow): Promi
       await window.loadURL(gameUrl);
 
       await window.webContents.executeJavaScript(`(${BACKLOGGD_AUTOMATION_SCRIPT.toString()})()(${game.rating})`)
+        .then(() => updateMigrationStatus(game.title))
         .catch(error => console.error(`Failed to rate: ${game.title}. See the stacktrace here: ${error}`));
     }
 

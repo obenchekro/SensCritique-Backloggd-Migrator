@@ -39,6 +39,6 @@ export class SensCritiqueBaseAuthStrategy implements ISensCritiqueAuthStrategy {
     fetchUserGamesOnlyRated(products: SensCritiqueScrappedProduct[]): BackloggdGames[] {
         return products
             .filter(p => p.genre === 'Jeu')
-            .map(p => ({ title: p.title, rating: p.rating }));
+            .map(p => ({ title: p.title, rating: p.rating, migrated: false }));
     }
 }
