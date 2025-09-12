@@ -60,7 +60,7 @@ export class SensCritiqueSSOAuthStrategy implements ISensCritiqueAuthStrategy {
     return gql`
         query GetRatings($username: String!) {
             user(username: $username) {
-                collection(limit: 9999) {
+                collection(limit: 999999) {
                     products {
                         id
                         title
@@ -89,13 +89,18 @@ export class SensCritiqueSSOAuthStrategy implements ISensCritiqueAuthStrategy {
   async fetchUserRatings(username: string): Promise<SensCritiqueProduct[]> {
     const query = this.getUserRatingsQuery();
     const result = await this.executeQuery<GetRatingsResponse, { username: string }>(query, { username });
-
     return result.user?.collection?.products ?? [];
   };
 
   fetchUserGamesOnlyRated(products: SensCritiqueProduct[]): BackloggdGames[] {
     return products
       .filter(p => p.url?.split('/')?.[1] === 'jeuvideo' && p.otherUserInfos.rating)
-      .map(p => ({ title: p.title, rating: p.otherUserInfos.rating, migrated: false }));
+      .map(p => ({ title: p.title, rating: p.otherUserInfos.rating, wishlist: false, migrated: false }));
+  };
+
+  fetchUserGamesOnWishlist(products: SensCritiqueProduct[]): BackloggdGames[] {
+    return products
+      .filter(p => p.url?.split('/')?.[1] === 'jeuvideo' && !p.otherUserInfos.rating)
+      .map(p => ({ title: p.title, rating: p.otherUserInfos.rating, wishlist: true, migrated: false }));
   };
 }

@@ -3,7 +3,7 @@ import { SensCritiqueScrappedProduct } from '../sc-backloggd-migrator-schemas/sc
 import { BackloggdGames } from '../sc-backloggd-migrator-schemas/backloggd-games.interface';
 import { BrowserWindow } from 'electron';
 import { delay } from '../sc-backloggd-migrator-utils/delay';
-const { DETECT_SC_TOTAL_PAGES, EXTRACT_SC_PAGE_DATA } = require('../sc-backloggd-migrator-scripts/sc-dom-crawling');
+const { DETECT_SC_TOTAL_PAGES, EXTRACT_SC_WISHLIST, EXTRACT_SC_PAGE_RATINGS } = require('../sc-backloggd-migrator-scripts/sc-dom-crawling');
 
 export class SensCritiqueBaseAuthStrategy implements ISensCritiqueAuthStrategy {
     private cookie: string;
@@ -12,7 +12,7 @@ export class SensCritiqueBaseAuthStrategy implements ISensCritiqueAuthStrategy {
         this.cookie = cookie;
     }
 
-    static async build(cookie: string): Promise<ISensCritiqueAuthStrategy> {
+    static async build(cookie: string): Promise<SensCritiqueBaseAuthStrategy> {
         return new SensCritiqueBaseAuthStrategy(cookie);
     }
 
@@ -30,15 +30,22 @@ export class SensCritiqueBaseAuthStrategy implements ISensCritiqueAuthStrategy {
             await window.loadURL(url);
             await delay(800);
 
-            const pageData = await window.webContents.executeJavaScript(`(${EXTRACT_SC_PAGE_DATA.toString()})()`);
-            allData.push(...pageData);
+            const pageRatings = await window.webContents.executeJavaScript(`(${EXTRACT_SC_PAGE_RATINGS.toString()})()`);
+            const pageWishlist = await window.webContents.executeJavaScript(`(${EXTRACT_SC_WISHLIST.toString()})()`);
+            allData.push(...pageRatings, ...pageWishlist);
         }
         return allData;
     }
 
     fetchUserGamesOnlyRated(products: SensCritiqueScrappedProduct[]): BackloggdGames[] {
         return products
-            .filter(p => p.genre === 'Jeu')
-            .map(p => ({ title: p.title, rating: p.rating, migrated: false }));
+            .filter(p => p.genre === 'Jeu' && p.rating)
+            .map(p => ({ title: p.title, rating: p.rating, wishlist: false, migrated: false }));
+    }
+
+    fetchUserGamesOnWishlist(products: SensCritiqueScrappedProduct[]): BackloggdGames[] {
+        return products
+            .filter(p => p.genre === 'Jeu' && !p.rating)
+            .map(p => ({ title: p.title, rating: p.rating, wishlist: true, migrated: false }));
     }
 }

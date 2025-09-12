@@ -5,4 +5,5 @@ import { SensCritiqueProduct, SensCritiqueScrappedProduct } from "../sc-backlogg
 export interface ISensCritiqueAuthStrategy {
     fetchUserRatings(username: string, window?: BrowserWindow): Promise<(SensCritiqueProduct | SensCritiqueScrappedProduct)[]>;
     fetchUserGamesOnlyRated(products: (SensCritiqueProduct | SensCritiqueScrappedProduct)[]): BackloggdGames[];
+    fetchUserGamesOnWishlist(products: (SensCritiqueProduct | SensCritiqueScrappedProduct)[]): BackloggdGames[];
 }
