@@ -5,9 +5,7 @@ const { FIREBASE_METADATA_SECRETS_MAP, USERNAME_SENSCRITIQUE_DOM_CONTENT, SENSCR
 
 export async function pollUserMetadata(window: BrowserWindow): Promise<SensCritiqueAuthOptions> {
   return retry(
-    async () => {
-      return window.webContents.executeJavaScript(`(${FIREBASE_METADATA_SECRETS_MAP.toString()})()`);
-    },
+    async () => window.webContents.executeJavaScript(`(${FIREBASE_METADATA_SECRETS_MAP.toString()})()`),
     'Failed to retrieve Firebase metadata after multiple retries.'
   );
 }
@@ -24,9 +22,7 @@ export async function pollUserCookie(window: BrowserWindow): Promise<string | un
 
 export async function extractUsernameFromDOM(window: BrowserWindow): Promise<string | undefined> {
   return retry(
-    async () => {
-      return window.webContents.executeJavaScript(`(${USERNAME_SENSCRITIQUE_DOM_CONTENT.toString()})()`);
-    },
+    async () => window.webContents.executeJavaScript(`(${USERNAME_SENSCRITIQUE_DOM_CONTENT.toString()})()`),
     'Failed to extract username from the DOM.',
     10,
     500,
