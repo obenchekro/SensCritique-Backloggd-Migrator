@@ -1,8 +1,8 @@
 # SensCritique-Backloggd-Migrator
 
 ## Overview
-This tool is designed to save you the hassle of manually rating your games on [Backloggd](https://backloggd.com) one by one.
-It automates the rating process by syncing your existing ratings from your [SensCritique](https://www.senscritique.com/) collection directly into Backloggd.
+This tool is designed to save you the hassle of manually rating and wishlisting your games on [Backloggd](https://backloggd.com) one by one.
+It automates the rating process by syncing your existing ratings and wishlist from your [SensCritique](https://www.senscritique.com/) collection directly into Backloggd.
 That way, you can spend less time clicking — and more time gaming.
 
 ## Disclaimer
@@ -32,6 +32,8 @@ Side effects may occur when intercepting or simulating certain DOM events. These
 
 Some game titles retrieved from SensCritique are labeled in french so the odds to not fetch the right game in Backloggd are quite high.
 
+Wishlist migration is also subject to the same caveats: if SensCritique or Backloggd change how they represent “Envies”/“Wishlist”, the process may break.
+
 Use at your own risk — and feel free to submit improvements or bug reports by opening a new [issue](https://github.com/obenchekro/SensCritique-Backloggd-Migrator/issues/new)!
 
 ## How to use it?
@@ -46,7 +48,7 @@ Simply log in to your SensCritique account as usual
 
 ![SC2](https://i.imgur.com/UbmlIKF.png)
 
-You'll be redirected to this following page where all your games rated would be gathered up! Wait until all the games are fetched!
+You'll be redirected to this following page where all your games rated and wishlist would be gathered up! Wait until all the games are fetched!
 
 ![SC3](https://i.imgur.com/4raUIBd.png)
 
@@ -65,7 +67,7 @@ Sit back, relax, and enjoy this [videogamedunkey video](https://www.youtube.com/
 ![SC5](https://i.imgur.com/6E2ARD8.png)
 
 Then finally, when all your migration ratings come to fruition...
-You'll be automatically redirected to your rated games page – a satisfying proof that the migration has been successfully accomplished
+You'll be automatically redirected to your rated and wishlisted games page – a satisfying proof that the migration has been successfully accomplished
 
 ![SC5](https://i.imgur.com/N2TkjLP.png)
 
