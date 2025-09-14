@@ -1,5 +1,5 @@
-import { BrowserWindow, session } from 'electron';
-import { extractUsernameFromDOM, pollUserMetadata } from './sc-user-metadata';
+import { BrowserWindow } from 'electron';
+import { extractUsernameFromDOM } from './sc-user-metadata';
 import { writeSavedGames } from '../../sc-backloggd-migrator-utils/filesystem';
 import { delay } from '../../sc-backloggd-migrator-utils/delay';
 import { BackloggdGames } from '../../sc-backloggd-migrator-schemas/backloggd-games.interface';
