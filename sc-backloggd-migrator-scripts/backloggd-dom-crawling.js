@@ -48,8 +48,26 @@ const BACKLOGGD_AUTOMATION_RATING_SCRIPT = () => async (rating) => {
     }
 };
 
+const BACKLOGGD_HTTP_STATUS_CODE_404_SCRIPT = () => {
+  try {
+    if (/\b404\b/i.test(document.title)) return true;
+    if (document.querySelector('.404-error')) return true;
+    const metas = [
+      ['meta[itemprop="name"]','content'],
+      ['meta[property="og:title"]','content'],
+      ['meta[name="twitter:title"]','content']
+    ];
+    for (const [sel, attr] of metas) {
+      const el = document.querySelector(sel);
+      if (el && /404 Not Found/i.test(el.getAttribute(attr) || '')) return true;
+    }
+    return false;
+  } catch { return false; }
+};
+
 module.exports = {
     USERNAME_BACKLOGGD_DOM_CONTENT,
     BACKLOGGD_AUTOMATION_RATING_SCRIPT,
-    BACKLOGGD_WISHLIST_SCRIPT
+    BACKLOGGD_WISHLIST_SCRIPT,
+    BACKLOGGD_HTTP_STATUS_CODE_404_SCRIPT
 };
