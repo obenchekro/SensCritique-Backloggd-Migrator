@@ -48,7 +48,7 @@ const BACKLOGGD_AUTOMATION_RATING_SCRIPT = () => async (rating) => {
     }
 };
 
-const BACKLOGGD_HTTP_STATUS_CODE_404_SCRIPT = () => {
+const BACKLOGGD_DOM_STATUS_CODE_404_SCRIPT = () => {
   try {
     if (/\b404\b/i.test(document.title)) return true;
     if (document.querySelector('.404-error')) return true;
@@ -69,5 +69,5 @@ module.exports = {
     USERNAME_BACKLOGGD_DOM_CONTENT,
     BACKLOGGD_AUTOMATION_RATING_SCRIPT,
     BACKLOGGD_WISHLIST_SCRIPT,
-    BACKLOGGD_HTTP_STATUS_CODE_404_SCRIPT
+    BACKLOGGD_DOM_STATUS_CODE_404_SCRIPT
 };

@@ -2,7 +2,7 @@ import { BrowserWindow, net } from "electron";
 import { slugify } from "../../sc-backloggd-migrator-utils/slug";
 import { readSavedGames, updateMigrationStatus } from "../../sc-backloggd-migrator-utils/filesystem";
 import { delay } from '../../sc-backloggd-migrator-utils/delay';
-const { BACKLOGGD_AUTOMATION_RATING_SCRIPT, BACKLOGGD_WISHLIST_SCRIPT, USERNAME_BACKLOGGD_DOM_CONTENT, BACKLOGGD_HTTP_STATUS_CODE_404_SCRIPT } = require('../../sc-backloggd-migrator-scripts/backloggd-dom-crawling');
+const { BACKLOGGD_AUTOMATION_RATING_SCRIPT, BACKLOGGD_WISHLIST_SCRIPT, USERNAME_BACKLOGGD_DOM_CONTENT, BACKLOGGD_DOM_STATUS_CODE_404_SCRIPT } = require('../../sc-backloggd-migrator-scripts/backloggd-dom-crawling');
 
 export async function runBackloggdRatingAutomation(window: BrowserWindow): Promise<void> {
   try {
@@ -17,11 +17,10 @@ export async function runBackloggdRatingAutomation(window: BrowserWindow): Promi
       await window.loadURL(gameUrl);
 
       const [serverSideHTTP404, clientSideHTTP404] = await Promise.all([
-        new Promise<boolean>(res =>
-          net.request(gameUrl).on("response", r => res(r.statusCode === 404)).end()
-        ),
-        window.webContents.executeJavaScript(`(${BACKLOGGD_HTTP_STATUS_CODE_404_SCRIPT.toString()})()`)
+        new Promise<boolean>(res => net.request(gameUrl).on("response", r => res(r.statusCode === 404)).end()),
+        window.webContents.executeJavaScript(`(${BACKLOGGD_DOM_STATUS_CODE_404_SCRIPT.toString()})()`)
       ]);
+
       if (serverSideHTTP404 || clientSideHTTP404) {
         console.warn(`[SKIP] ${game.title} → Page not found (HTTP 404)`);
         continue;
