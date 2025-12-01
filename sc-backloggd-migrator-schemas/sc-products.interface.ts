@@ -28,6 +28,7 @@ export interface SensCritiqueScrappedProduct {
     title: string;
     rating: number;
     genre: string;
+    wishlist: boolean;
 };
 
 export interface GetRatingsResponse {

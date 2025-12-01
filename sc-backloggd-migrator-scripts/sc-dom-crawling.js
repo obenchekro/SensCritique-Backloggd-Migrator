@@ -57,52 +57,25 @@ const USERNAME_SENSCRITIQUE_DOM_CONTENT = async () => {
     });
 };
 
-const EXTRACT_SC_PAGE_RATINGS = () => {
-    const results = [];
-    const gameCards = document.querySelectorAll('div[data-testid="poster"]');
-    gameCards.forEach((card) => {
-        const img = card.querySelector('img[data-testid="poster-img"]');
-
-        const ratingEl = Array.from(card.parentElement?.querySelectorAll('div[data-testid="Rating"]') || [])
-            .find(el => !el.classList.contains('globalRating'));
-
-        const title = img?.alt?.trim() ?? '';
-        const rating = ratingEl ? parseFloat(ratingEl.textContent || '') : null;
-
-        const genreEl = card.parentElement?.parentElement?.parentElement?.querySelector('span[data-testid="creators-category"] span');
-        const genre = genreEl?.textContent?.trim() ?? '';
-
-        if (title && rating !== null && !isNaN(rating)) {
-            results.push({ title, rating, genre });
-        }
-    });
-    return results;
-};
-
-const EXTRACT_SC_WISHLIST = () => {
+const EXTRACT_SC_PAGE_DATA = () => {
   const results = [];
   const items = document.querySelectorAll('[data-testid="product-list-item"]');
 
-  items.forEach((item) => {
-    const isWish =
-      !!item.querySelector('svg[data-testid="icon-bookmark"]') ||
-      !!item.querySelector('[data-testid="wish"]') ||
-      !!item.querySelector('[data-action="WISH"]') ||
-      !!item.querySelector('[aria-label*="Envie"], [title*="Envie"]');
-
-    if (!isWish) return;
-
-    const posterLink = item.querySelector('a[data-testid="poster"]');
-    const img = posterLink?.querySelector('img[data-testid="poster-img"]');
+  items.forEach(item => {
+    const img = item.querySelector('img[data-testid="poster-img"]');
     const title = img?.alt?.trim() || item.querySelector('[data-testid="product-title"]')?.textContent?.trim() || '';
 
-    const ratingEl = item.querySelector('[data-testid="Rating"]:not(.globalRating)');
-    const rating = ratingEl ? parseFloat((ratingEl.textContent || '').replace(',', '.')) : null;
+    const userRatingEl = item.querySelector('[data-testid="actions-info"] [data-testid="Rating"]');
+    const rating = userRatingEl ? parseFloat((userRatingEl.textContent || '').replace(',', '.')) : null;
 
     const genreEl = item.querySelector('span[data-testid="creators-category"] span');
     const genre = genreEl?.textContent?.trim() ?? '';
 
-    if (title) results.push({ title, rating, genre });
+    const isWished = !!item.querySelector('[data-testid="actions-info"] [data-testid="icon-bookmark"]');
+
+    if (title) {
+      results.push({ title, rating, genre, wishlist: isWished });
+    }
   });
 
   return results;
@@ -119,8 +92,7 @@ const SENSCRITIQUE_FIREBASE_METADATA_TO_TRASH = async () => indexedDB.deleteData
 module.exports = {
     FIREBASE_METADATA_SECRETS_MAP,
     USERNAME_SENSCRITIQUE_DOM_CONTENT,
-    EXTRACT_SC_PAGE_RATINGS,
-    EXTRACT_SC_WISHLIST,
+    EXTRACT_SC_PAGE_DATA,
     DETECT_SC_TOTAL_PAGES,
     SENSCRITIQUE_FIREBASE_METADATA_TO_TRASH
 };

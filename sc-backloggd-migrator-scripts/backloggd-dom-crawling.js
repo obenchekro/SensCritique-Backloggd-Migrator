@@ -8,61 +8,69 @@ const USERNAME_BACKLOGGD_DOM_CONTENT = async () => {
 }
 
 const BACKLOGGD_WISHLIST_SCRIPT = () => {
-    const gameIdEl = document.querySelector('#game-page-id');
-    const gameId = gameIdEl?.getAttribute('game_id');
-    if (!gameId) return console.warn('game_id not found');
+    const gameIdEl = document.querySelector('[data-game-id]');
+    const gameId = gameIdEl?.getAttribute('data-game-id');
+    if (!gameId) return console.error('Cannot retrieve the game ID from the DOM.');
 
-    const wishlistButton = document.querySelector(`#wishlist-${gameId} > button[game_id="${gameId}"]`)
-        || document.querySelector(`#wishlist-${gameId} button`)
-        || Array.from(document.querySelectorAll('#buttons .wishlist-btn-container button'))[0];
+    const backlogButton =
+        document.querySelector(`.backlog-btn-container[game_id="${gameId}"] button`) ||
+        document.querySelector(`.backlog-btn-container button`) ||
+        Array.from(document.querySelectorAll('.backlog-btn-container button'))[0];
 
-    if (!wishlistButton) return console.warn('Wishlist button not found via #wishlist-{id}.');
+    if (!backlogButton) return console.error('Backlog button not found.');
 
-    const wishlistEvent = new MouseEvent('click', { bubbles: true, cancelable: true, view: window });
-    if (!wishlistButton.dispatchEvent(wishlistEvent)) wishlistButton.click();
+    const backlogEvent = new MouseEvent('click', { bubbles: true, cancelable: true, view: window });
+    if (!backlogButton.dispatchEvent(backlogEvent)) backlogButton.click();
 };
 
+
 const BACKLOGGD_AUTOMATION_RATING_SCRIPT = () => async (rating) => {
-    const gameIdEl = document.querySelector('#game-page-id');
-    const gameId = gameIdEl?.getAttribute('game_id');
-    if (!gameId) console.warn("Cannot retrieve gameId of the current game page.");
+    const gameIdEl = document.querySelector('[data-game-id]');
+    const gameId = gameIdEl?.getAttribute('data-game-id');
+
+    if (!gameId) console.error("Cannot retrieve the game ID from the DOM.");
 
     const csrfMeta = document.querySelector('meta[name="csrf-token"]');
     const csrf = csrfMeta?.content;
-    if (!csrf) console.warn("Cannot retrieve CSRF token to ensure the reliability of the request.")
+    if (!csrf) console.error("Cannot retrieve CSRF token.");
 
-    const response = await fetch(`/rate/${gameId}`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-            "X-CSRF-Token": csrf,
-            "X-Requested-With": "XMLHttpRequest",
-        },
-        body: `rating=${rating}`
-    });
+    try {
+        const response = await fetch(`/rate/${gameId}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRF-Token": csrf,
+                "X-Requested-With": "XMLHttpRequest",
+            },
+            body: `rating=${encodeURIComponent(rating)}`
+        });
 
-    if (response.ok) {
-        console.log(`Succesfully rated the game ${gameId} with the following rating: ${rating}`);
-    } else {
-        console.warn(`Request to the Backloggd server failed with the following status code: ${response.status}`);
+        if (response.ok) {
+            console.log(`Successfully rated game ${gameId} with rating: ${rating}`);
+        } else {
+            console.error(`Request failed with status code: ${response.status}`);
+        }
+    } catch (err) {
+        console.error("Error while sending the request:", err);
     }
 };
 
+
 const BACKLOGGD_DOM_STATUS_CODE_404_SCRIPT = () => {
-  try {
-    if (/\b404\b/i.test(document.title)) return true;
-    if (document.querySelector('.404-error')) return true;
-    const metas = [
-      ['meta[itemprop="name"]','content'],
-      ['meta[property="og:title"]','content'],
-      ['meta[name="twitter:title"]','content']
-    ];
-    for (const [sel, attr] of metas) {
-      const el = document.querySelector(sel);
-      if (el && /404 Not Found/i.test(el.getAttribute(attr) || '')) return true;
-    }
-    return false;
-  } catch { return false; }
+    try {
+        if (/\b404\b/i.test(document.title)) return true;
+        if (document.querySelector('.404-error')) return true;
+        const metas = [
+            ['meta[itemprop="name"]', 'content'],
+            ['meta[property="og:title"]', 'content'],
+            ['meta[name="twitter:title"]', 'content']
+        ];
+        for (const [sel, attr] of metas) {
+            const el = document.querySelector(sel);
+            if (el && /404 Not Found/i.test(el.getAttribute(attr) || '')) return true;
+        }
+        return false;
+    } catch { return false; }
 };
 
 module.exports = {

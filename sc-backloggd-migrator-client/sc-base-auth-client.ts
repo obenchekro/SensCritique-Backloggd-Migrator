@@ -3,7 +3,7 @@ import { SensCritiqueScrappedProduct } from '../sc-backloggd-migrator-schemas/sc
 import { BackloggdGames } from '../sc-backloggd-migrator-schemas/backloggd-games.interface';
 import { BrowserWindow } from 'electron';
 import { delay } from '../sc-backloggd-migrator-utils/delay';
-const { DETECT_SC_TOTAL_PAGES, EXTRACT_SC_WISHLIST, EXTRACT_SC_PAGE_RATINGS } = require('../sc-backloggd-migrator-scripts/sc-dom-crawling');
+const { DETECT_SC_TOTAL_PAGES, EXTRACT_SC_PAGE_DATA } = require('../sc-backloggd-migrator-scripts/sc-dom-crawling');
 
 export class SensCritiqueBaseAuthStrategy implements ISensCritiqueAuthStrategy {
     private cookie: string;
@@ -30,9 +30,8 @@ export class SensCritiqueBaseAuthStrategy implements ISensCritiqueAuthStrategy {
             await window.loadURL(url);
             await delay(800);
 
-            const pageRatings = await window.webContents.executeJavaScript(`(${EXTRACT_SC_PAGE_RATINGS.toString()})()`);
-            const pageWishlist = await window.webContents.executeJavaScript(`(${EXTRACT_SC_WISHLIST.toString()})()`);
-            allData.push(...pageRatings, ...pageWishlist);
+            const pageData = await window.webContents.executeJavaScript(`(${EXTRACT_SC_PAGE_DATA.toString()})()`);
+            allData.push(...pageData);
         }
         return allData;
     }
@@ -40,12 +39,12 @@ export class SensCritiqueBaseAuthStrategy implements ISensCritiqueAuthStrategy {
     fetchUserGamesOnlyRated(products: SensCritiqueScrappedProduct[]): BackloggdGames[] {
         return products
             .filter(p => p.genre === 'Jeu' && p.rating)
-            .map(p => ({ title: p.title, rating: p.rating, wishlist: false, migrated: false }));
+            .map(p => ({ title: p.title, rating: p.rating, wishlist: p.wishlist, migrated: false }));
     }
 
     fetchUserGamesOnWishlist(products: SensCritiqueScrappedProduct[]): BackloggdGames[] {
         return products
             .filter(p => p.genre === 'Jeu' && !p.rating)
-            .map(p => ({ title: p.title, rating: p.rating, wishlist: true, migrated: false }));
+            .map(p => ({ title: p.title, rating: p.rating, wishlist: p.wishlist, migrated: false }));
     }
 }
