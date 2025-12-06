@@ -1,2 +1,2 @@
 require('ts-node').register();
-require('./sc-backloggd-migrator-gui/main.ts');
+require('./sc-backloggd-migrator-gui/runtime/main.ts');

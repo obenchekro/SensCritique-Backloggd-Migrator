@@ -16,9 +16,9 @@ export class SensCritiqueClientStrategy {
                 return SensCritiqueSSOAuthStrategy.build(firebaseMetaData);
             },
             base: async () => {
-                console.log('✅ BaseAuth mode enabled');
                 const cookie = await pollUserCookie(window);
                 await delay(3000);
+                console.log('✅ BaseAuth mode enabled');
                 return SensCritiqueBaseAuthStrategy.build(cookie!);
             }
         };
