@@ -27,15 +27,7 @@
       <li>Paginate into each game to be rated in Backloggd</li>
     </ol>
   </div>
-
-  <script>
-    window.addEventListener("DOMContentLoaded", () => {
-      const button = document.getElementById("start-btn");
-      button?.addEventListener("click", () => {
-        window.electronAPI?.startMigration?.();
-      });
-    });
-  </script>
+  <script src="./migrator-page.js"></script>
 </body>
 
 </html>

@@ -19,7 +19,7 @@ app.whenReady().then(async () => {
     }
   });
 
-  await mainWindow.loadFile(path.resolve(__dirname, '../vues/migrator-page/migrator-page.html'));
+  await mainWindow.loadFile(path.resolve(__dirname, '../views/migrator-page/migrator-page.html'));
   await flushMetadata(mainWindow);
 
   ipcMain.handle('start-migration', () => startMigrationHandler(mainWindow));

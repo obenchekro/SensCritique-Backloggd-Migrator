@@ -9,7 +9,7 @@ export async function startMigrationHandler(mainWindow: BrowserWindow) {
     mainWindow.webContents.once('did-finish-load', async () => {
         const games = await runMigration(mainWindow);
         if (games) {
-            await mainWindow.loadFile(path.resolve(__dirname, '../vues/real-time-data/real-time-data.html'));
+            await mainWindow.loadFile(path.resolve(__dirname, '../views/real-time-data/real-time-data.html'));
         }
     });
 }

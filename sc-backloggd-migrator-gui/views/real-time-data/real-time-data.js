@@ -1,0 +1,37 @@
+const consoleDiv = document.getElementById('console');
+
+function printLine(text) {
+  const p = document.createElement('p');
+  p.textContent = text;
+  p.className = 'line';
+  consoleDiv.appendChild(p);
+  consoleDiv.scrollTop = consoleDiv.scrollHeight;
+}
+
+async function fetchDataAndLaunchBackloggdWorkflow() {
+  try {
+    printLine("🔄 Trying to fetch data from your SensCritique account...");
+    const scGames = await window.electronAPI.redirectToDisplay();
+
+    if (!scGames || scGames.length === 0) {
+      printLine("❌ No game data was found. Please make sure your SensCritique account has games listed or that you're connected correctly.");
+      return;
+    }
+
+    printLine("📦 Data fetched. Import in progress...\n");
+    for (let i = 0; i < scGames.length; i++) {
+      const game = scGames[i];
+      printLine(`✔ ${i + 1}/${scGames.length} : "${game.title}"`);
+      await new Promise(resolve => setTimeout(resolve, 100 + Math.random() * 100));
+    }
+
+    printLine("\n✅ All your game ratings have been crunched just for you. Stick with us while we redirect you to your targetted Backlogged account.");
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    await window.electronAPI.runBackloggdRatings();
+  } catch (e) {
+    printLine(`❌ How inconvenient! There was an unfortunate glitch that just messed up all this data gathering: ${e.message}`);
+    console.error(e);
+  }
+}
+
+fetchDataAndLaunchBackloggdWorkflow();
