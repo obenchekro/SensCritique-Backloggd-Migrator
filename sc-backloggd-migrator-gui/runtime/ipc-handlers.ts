@@ -3,8 +3,9 @@ import { BrowserWindow } from 'electron';
 import { runMigration } from '../core/sc-migration-ratings';
 import { runBackloggdRatingAutomation } from '../core/backloggd-import-ratings';
 import { readSavedGames } from '../../sc-backloggd-migrator-utils/filesystem';
+import { BackloggdGames } from '../../sc-backloggd-migrator-schemas/backloggd-games.interface';
 
-export async function startMigrationHandler(mainWindow: BrowserWindow) {
+export async function startMigrationHandler(mainWindow: BrowserWindow): Promise<void> {
     await mainWindow.loadURL('https://www.senscritique.com');
     mainWindow.webContents.once('did-finish-load', async () => {
         const games = await runMigration(mainWindow);
@@ -14,7 +15,7 @@ export async function startMigrationHandler(mainWindow: BrowserWindow) {
     });
 }
 
-export async function runBackloggdRatingHandler(mainWindow: BrowserWindow) {
+export async function runBackloggdRatingHandler(mainWindow: BrowserWindow): Promise<boolean> {
     try {
         await mainWindow.loadURL('https://backloggd.com/users/sign_in');
 
@@ -27,10 +28,10 @@ export async function runBackloggdRatingHandler(mainWindow: BrowserWindow) {
                     mainWindow.webContents.removeListener('did-navigate-in-page', handler);
 
                     try {
-                        const result = await runBackloggdRatingAutomation(mainWindow);
-                        resolve({ success: true, data: result });
+                        await runBackloggdRatingAutomation(mainWindow);
+                        resolve(true);
                     } catch (err) {
-                        reject({ success: false, error: err });
+                        reject(false);
                     }
                 }
             };
@@ -39,11 +40,11 @@ export async function runBackloggdRatingHandler(mainWindow: BrowserWindow) {
             mainWindow.webContents.on('did-navigate-in-page', handler);
         });
     } catch (error) {
-        return { success: false, error };
+        return false;
     }
 }
 
-export function redirectToDisplayHandler() { 
+export function redirectToDisplayHandler(): BackloggdGames[] { 
     return readSavedGames(); 
 }
 
